@@ -1,0 +1,27 @@
+# Project memory
+
+- Entry point: `scripts/install.sh`.
+- The script uses Bash and has no required third-party runtime.
+- System source configuration is intentionally opt-in, with timestamped backups.
+- Package-manager, npm, pip, and Docker mirror choices are based on a fresh,
+  bounded latency test of China-mainland candidates; no mirror is hard-coded as
+  the selected default.
+- FlClash is resolved from its upstream GitHub latest-release API for the current
+  OS and CPU architecture.
+- Validation completed: `bash -n scripts/install.sh`, a menu exit smoke test, and
+  a read-only FlClash release-asset lookup.
+- npm mirror probing was smoke-tested and correctly displayed the reachable
+  results before cancellation; no npm configuration was modified.
+- Docker's public candidate set is documented in `docs/docker-mirrors.md` and is
+  filtered dynamically through a `/v2/` probe before selection.
+- Docker's latest smoke test displayed a ranked top five from ten candidates and
+  was cancelled before any Docker configuration changed.
+- Network configuration uses the default-route interface only and requires a
+  confirmation because applying or restoring DHCP restarts its network path.
+- Static-IP input and cancellation were smoke-tested on macOS: the script found
+  `en0`/Wi-Fi, validated the supplied address values, and made no configuration
+  change after confirmation was declined.
+- Startup branding is rendered by `print_banner` using only `printf`.
+- Docker installs include the Compose plugin; Podman installs include
+  `podman-compose`, which supplies the external provider used by `podman compose`.
+- The expanded 14-item menu passed a no-op smoke test.
