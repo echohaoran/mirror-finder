@@ -15,11 +15,11 @@ RESULT_BASES=()
 
 print_banner() {
   printf '\n'
-  printf '  ███████  ██████ ██   ██  ██████        ██   ██  █████  ██████   ██████  ███    ██\n'
-  printf '  ██      ██      ██   ██ ██    ██       ██   ██ ██   ██ ██   ██ ██    ██ ████   ██\n'
-  printf '  █████   ██      ███████ ██    ██ █████ ███████ ███████ ██████  ███████ ██ ██  ██\n'
-  printf '  ██      ██      ██   ██ ██    ██       ██   ██ ██   ██ ██   ██ ██    ██ ██  ██ ██\n'
-  printf '  ███████  ██████ ██   ██  ██████        ██   ██ ██   ██ ██   ██ ██   ██ ██   ████\n'
+  printf '  ███████  ██████ ██   ██  ██████          ██   ██  █████  ██████   ██████  ███    ██\n'
+  printf '  ██      ██      ██   ██ ██    ██         ██   ██ ██   ██ ██   ██ ██    ██ ████   ██\n'
+  printf '  █████   ██      ███████ ██    ██         ███████ ███████ ██████  ████████ ██ ██  ██\n'
+  printf '  ██      ██      ██   ██ ██    ██         ██   ██ ██   ██ ██   ██ ██    ██ ██  ██ ██\n'
+  printf '  ███████  ██████ ██   ██  ██████   █████  ██   ██ ██   ██ ██   ██ ██    ██ ██   ████\n'
   printf '\n'
 }
 
@@ -27,7 +27,15 @@ info() { printf '\033[1;34m[INFO]\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m[WARN]\033[0m %s\n' "$*"; }
 die() { printf '\033[1;31m[ERROR]\033[0m %s\n' "$*" >&2; exit 1; }
 need() { command -v "$1" >/dev/null 2>&1 || die "需要命令：$1"; }
-confirm() { read -r -p "$1 [y/N] " answer; [[ "$answer" =~ ^[Yy]$ ]]; }
+read_interactive() {
+  local prompt="$1" variable="$2"
+  if [[ -r /dev/tty ]]; then
+    read -r -p "$prompt" "$variable" </dev/tty
+  else
+    read -r -p "$prompt" "$variable"
+  fi
+}
+confirm() { local answer; read_interactive "$1 [y/N] " answer; [[ "$answer" =~ ^[Yy]$ ]]; }
 sudo_cmd() { if [[ $EUID -eq 0 ]]; then "$@"; else sudo "$@"; fi; }
 backup() {
   local source="$1" target
@@ -157,7 +165,7 @@ choose_fast_mirror() {
     RESULT_NAMES+=("$name"); RESULT_BASES+=("$base")
     printf '  %d) %-16s %7.3fs  %s\n' "${#RESULT_BASES[@]}" "$name" "$elapsed" "$base"
   done < <(sort -t $'\t' -k1,1n "$tmp")
-  read -r -p "请选择镜像编号（0 取消）: " selected
+  read_interactive "请选择镜像编号（0 取消）: " selected
   [[ "$selected" =~ ^[1-5]$ && "$selected" -le "${#RESULT_BASES[@]}" ]] || { rm -f "$tmp"; warn "已取消。"; return 1; }
   SELECTED_MIRROR="${RESULT_BASES[$((selected - 1))]}"
   rm -f "$tmp"
@@ -528,9 +536,9 @@ EOF
 configure_static_ip() {
   local ip mask gateway
   detect_network_backend
-  read -r -p "固定 IPv4 地址: " ip
-  read -r -p "子网掩码（例如 255.255.255.0）: " mask
-  read -r -p "默认网关: " gateway
+  read_interactive "固定 IPv4 地址: " ip
+  read_interactive "子网掩码（例如 255.255.255.0）: " mask
+  read_interactive "默认网关: " gateway
   valid_ipv4 "$ip" || die "IP 地址格式无效。"
   valid_ipv4 "$gateway" || die "网关地址格式无效。"
   mask_to_prefix "$mask" >/dev/null || die "子网掩码格式无效。"
@@ -612,7 +620,7 @@ main() {
 13) 配置固定 IP        14) 恢复 DHCP
 0) 退出
 EOF
-    read -r -p "请选择：" choice
+    read_interactive "请选择：" choice
     [[ "$choice" == "0" ]] && break
     run_item "$choice"
   done

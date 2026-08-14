@@ -33,3 +33,7 @@ latency order, then require selection and confirmation before configuration.
   (default interface `en0`, Wi-Fi service); no network settings were changed.
 - The launcher now renders an `ECHO-HAORAN` ASCII banner via `printf` before
   system detection.
+- Fixed pipe-launch interaction: prompts now read `/dev/tty` where available;
+  README uses `bash -c "$(curl ...)"` so stdin remains the terminal.
+- A PTY smoke test confirmed `cat scripts/install.sh | bash` reaches the menu and
+  accepts `0` from the terminal without executing an action.

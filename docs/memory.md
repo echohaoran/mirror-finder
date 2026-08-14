@@ -26,3 +26,7 @@
   `podman-compose`, which supplies the external provider used by `podman compose`.
 - The expanded 14-item menu passed a no-op smoke test.
 - Direct launch URL: `https://raw.githubusercontent.com/echohaoran/mirror-finder/main/scripts/install.sh`.
+- Do not document the launcher as `curl URL | bash`: that pipelines script text
+  into stdin. Prompts use `/dev/tty`, and the documented command uses `bash -c`.
+- Pipe-launch regression test passed in a PTY: the script accepted a terminal
+  menu selection and exited normally.
