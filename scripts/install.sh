@@ -21,8 +21,11 @@ print_banner() {
   printf '  ██      ██      ██   ██ ██    ██         ██   ██ ██   ██ ██   ██ ██    ██ ██  ██ ██\n'
   printf '  ███████  ██████ ██   ██  ██████   █████  ██   ██ ██   ██ ██   ██ ██    ██ ██   ████\n'
   printf '\n'
+  printf '\n'
+  printf '本脚本来自"https://github.com/echohaoran/mirror-finder"\n'
+  printf '博客地址"https://echohaoran.top"\n'
+  printf '由EchoHaoRan进行编写\n'
 }
-
 info() { printf '\033[1;34m[INFO]\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m[WARN]\033[0m %s\n' "$*"; }
 die() { printf '\033[1;31m[ERROR]\033[0m %s\n' "$*" >&2; exit 1; }

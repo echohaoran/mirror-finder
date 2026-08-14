@@ -30,3 +30,4 @@
   into stdin. Prompts use `/dev/tty`, and the documented command uses `bash -c`.
 - Pipe-launch regression test passed in a PTY: the script accepted a terminal
   menu selection and exited normally.
+- The startup banner links to the project repository and `echohaoran.top`.

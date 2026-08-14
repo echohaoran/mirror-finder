@@ -37,3 +37,5 @@ latency order, then require selection and confirmation before configuration.
   README uses `bash -c "$(curl ...)"` so stdin remains the terminal.
 - A PTY smoke test confirmed `cat scripts/install.sh | bash` reaches the menu and
   accepts `0` from the terminal without executing an action.
+- Startup banner now includes the repository URL, blog URL, and EchoHaoRan
+  authorship notice.
