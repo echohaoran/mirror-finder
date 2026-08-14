@@ -30,4 +30,6 @@
   into stdin. Prompts use `/dev/tty`, and the documented command uses `bash -c`.
 - Pipe-launch regression test passed in a PTY: the script accepted a terminal
   menu selection and exited normally.
+- Distribution remotes: `gitee` is `git@gitee.com:echohaoran/mirror-finder.git`;
+  `cnb` is `https://cnb.cool/echohaoran/mirror-finder.git`.
 - The startup banner links to the project repository and `echohaoran.top`.

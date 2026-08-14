@@ -37,5 +37,8 @@ latency order, then require selection and confirmation before configuration.
   README uses `bash -c "$(curl ...)"` so stdin remains the terminal.
 - A PTY smoke test confirmed `cat scripts/install.sh | bash` reaches the menu and
   accepts `0` from the terminal without executing an action.
+- Repository mirrors: Gitee uses SSH; CNB uses HTTPS and requires a CNB access
+  token for write operations. README includes the raw-file one-line launcher for
+  GitHub, Gitee, and CNB.
 - Startup banner now includes the repository URL, blog URL, and EchoHaoRan
   authorship notice.

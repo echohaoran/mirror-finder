@@ -13,10 +13,24 @@ chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
 
-也可以用一条命令直接执行最新版：
+也可以从任一代码托管来源用一条命令直接执行最新版：
+
+GitHub：
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/echohaoran/mirror-finder/main/scripts/install.sh)"
+```
+
+Gitee：
+
+```bash
+bash -c "$(curl -fsSL https://gitee.com/echohaoran/mirror-finder/raw/main/scripts/install.sh)"
+```
+
+CNB：
+
+```bash
+bash -c "$(curl -fsSL https://cnb.cool/echohaoran/mirror-finder/-/git/raw/main/scripts/install.sh)"
 ```
 
 该命令会下载并执行脚本，同时保留终端输入供菜单使用；如需在执行前审阅内容，请使用上方的克隆方式。
