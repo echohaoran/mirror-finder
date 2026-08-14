@@ -25,3 +25,4 @@
 - Docker installs include the Compose plugin; Podman installs include
   `podman-compose`, which supplies the external provider used by `podman compose`.
 - The expanded 14-item menu passed a no-op smoke test.
+- Direct launch URL: `https://raw.githubusercontent.com/echohaoran/mirror-finder/main/scripts/install.sh`.

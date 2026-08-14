@@ -27,6 +27,8 @@ latency order, then require selection and confirmation before configuration.
   configuration were added as menu items 8 and 9.
 - Menu smoke test after the Podman change passed without triggering an install or
   a configuration write.
+- README now provides the GitHub Raw one-line launch command for the latest
+  installer, alongside the clone-and-review workflow.
 - macOS route-to-service detection was verified in the development environment
   (default interface `en0`, Wi-Fi service); no network settings were changed.
 - The launcher now renders an `ECHO-HAORAN` ASCII banner via `printf` before

@@ -13,6 +13,14 @@ chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
 
+也可以用一条命令直接执行最新版：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/echohaoran/mirror-finder/main/scripts/install.sh | bash
+```
+
+该命令会下载并执行脚本；如需在执行前审阅内容，请使用上方的克隆方式。
+
 也可只执行一项，例如 `./scripts/install.sh 2` 安装 Node.js、npm 与 npx。
 
 支持 macOS（Homebrew）以及 Debian/Ubuntu、Fedora/RHEL/Rocky/AlmaLinux、Arch Linux。Windows 请在 WSL 中运行。
