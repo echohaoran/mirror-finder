@@ -32,4 +32,6 @@
   menu selection and exited normally.
 - Distribution remotes: `gitee` is `git@gitee.com:echohaoran/mirror-finder.git`;
   `cnb` is `https://cnb.cool/echohaoran/mirror-finder.git`.
+- Gitee `main` is initialized and mirrors GitHub. CNB push requires HTTPS token
+  authentication (username `cnb`) before it can be initialized.
 - The startup banner links to the project repository and `echohaoran.top`.

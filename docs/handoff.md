@@ -40,5 +40,8 @@ latency order, then require selection and confirmation before configuration.
 - Repository mirrors: Gitee uses SSH; CNB uses HTTPS and requires a CNB access
   token for write operations. README includes the raw-file one-line launcher for
   GitHub, Gitee, and CNB.
+- `main` was pushed successfully to Gitee. CNB remote configuration is present,
+  but the initial push is pending a CNB access token in the local credential
+  helper.
 - Startup banner now includes the repository URL, blog URL, and EchoHaoRan
   authorship notice.
