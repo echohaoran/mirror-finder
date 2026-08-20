@@ -22,3 +22,7 @@ npm、pip、Chocolatey、APT/DNF/Pacman、Homebrew bottles 和容器镜像属于
 Claude Code 的 macOS/Linux 与 Windows 原生安装器已镜像到本目录，并固定使用 `stable`
 渠道。平台二进制由安装器从 Anthropic 发布服务解析，并依据官方 manifest 的 SHA-256
 进行校验；原生安装保留后台安全更新能力。
+
+Pi Agent 固定为当前正式版 0.73.1。MiMoCode 固定入口包为小米官方 `@mimo-ai/cli`
+0.1.13；其十二个平台可选包合计约 500 MB，未全部写入普通 Git 历史。npm 安装时只会
+优先通过 npmmirror 解析当前平台包，失败后才回退用户当前 npm registry。

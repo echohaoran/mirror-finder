@@ -1,5 +1,11 @@
 # Handoff
 
+## 2026-08-20 MiMoCode
+
+- Pi Agent remains menu item 19 at the current 0.73.1 release.
+- Menu item 24 installs official Xiaomi MiMoCode 0.1.13 from a CNB-first npm entry tarball.
+- npm resolves only the current platform optional binary through the configured registry.
+
 ## 2026-08-20 Claude Code CLI
 
 - Menu item 23 installs Claude Code CLI from mirrored native installers using the stable channel.

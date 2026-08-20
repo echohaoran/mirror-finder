@@ -11,7 +11,7 @@
 
 [CmdletBinding()]
 param(
-    [ValidateRange(1, 23)]
+    [ValidateRange(1, 24)]
     [int]$Item
 )
 
@@ -382,8 +382,22 @@ function Install-PiAgent {
     $package = Join-Path ([IO.Path]::GetTempPath()) ('pi-coding-agent-{0}.tgz' -f [guid]::NewGuid())
     try {
         Get-MirroredAsset 'packages/pi-coding-agent-0.73.1.tgz' 'https://registry.npmjs.org/@mariozechner/pi-coding-agent/-/pi-coding-agent-0.73.1.tgz' $package
-        npm install --global $package
+        npm install --global $package --registry 'https://registry.npmmirror.com'
+        if ($LASTEXITCODE -ne 0) { Write-WarningMessage 'npmmirror 安装失败，回退当前 npm registry。'; npm install --global $package }
         if ($LASTEXITCODE -ne 0) { Stop-WithError 'Pi Agent 安装失败。' }
+    } finally { Remove-Item -LiteralPath $package -Force -ErrorAction SilentlyContinue }
+}
+
+function Install-MiMoCode {
+    if (-not (Test-Command 'npm')) { Write-Info '未检测到 Node.js，先安装 Node.js LTS。'; Install-Node }
+    if (-not (Confirm-Action '确认安装小米官方 MiMoCode 0.1.13？')) { return }
+    $package = Join-Path ([IO.Path]::GetTempPath()) ('mimo-ai-cli-{0}.tgz' -f [guid]::NewGuid())
+    try {
+        Get-MirroredAsset 'packages/mimo-ai-cli-0.1.13.tgz' 'https://registry.npmjs.org/@mimo-ai/cli/-/cli-0.1.13.tgz' $package
+        npm install --global $package --registry 'https://registry.npmmirror.com'
+        if ($LASTEXITCODE -ne 0) { Write-WarningMessage 'npmmirror 安装失败，回退当前 npm registry。'; npm install --global $package }
+        if ($LASTEXITCODE -ne 0) { Stop-WithError 'MiMoCode 安装失败。' }
+        if (Test-Command 'mimo') { mimo --version } else { Write-WarningMessage 'MiMoCode 已安装；请重开 PowerShell 后运行 mimo。' }
     } finally { Remove-Item -LiteralPath $package -Force -ErrorAction SilentlyContinue }
 }
 
@@ -431,7 +445,7 @@ function Check-Environment {
     Write-Host "`n系统：$([Environment]::OSVersion.VersionString)"
     Write-Host "PowerShell：$($PSVersionTable.PSVersion)"
     Write-Host "架构：$env:PROCESSOR_ARCHITECTURE`n"
-    foreach ($tool in @('git', 'choco', 'node', 'npm', 'python', 'pip', 'ffmpeg', 'opencode', 'hermes', 'claude', 'playwright')) {
+    foreach ($tool in @('git', 'choco', 'node', 'npm', 'python', 'pip', 'ffmpeg', 'opencode', 'hermes', 'claude', 'mimo', 'playwright')) {
         $command = Get-Command $tool -ErrorAction SilentlyContinue
         if ($command) { Write-Host ('  OK  {0,-12} {1}' -f $tool, $command.Source) -ForegroundColor Green }
         else { Write-Host ('  --  {0,-12} 未安装或不在 PATH 中' -f $tool) -ForegroundColor DarkYellow }
@@ -473,6 +487,7 @@ function Invoke-MenuItem([int]$Number) {
         21 { Install-CodexDesktop }
         22 { Install-Git }
         23 { Install-ClaudeCode }
+        24 { Install-MiMoCode }
         default { Stop-WithError "无效选项：$Number" }
     }
 }
@@ -492,6 +507,7 @@ function Show-Menu {
 19) 安装 Pi Agent        20) 安装 Codex CLI
 21) 安装 Codex 桌面客户端
 22) 安装 Git             23) 安装 Claude Code CLI
+24) 安装 MiMoCode
 0) 退出
 '@
     Write-Host $menu

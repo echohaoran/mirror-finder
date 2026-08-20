@@ -395,7 +395,7 @@ check_environment() {
     *) processor_name="未知架构" ;;
   esac
   printf '\n系统信息：\n  系统：%s\n  处理器：%s（%s）\n\n组件状态：\n' "$(uname -s)" "$processor_name" "$machine_arch"
-  for tool in git brew node npm ffmpeg claude ego-browser; do
+  for tool in git brew node npm ffmpeg claude mimo ego-browser; do
     if command -v "$tool" >/dev/null 2>&1; then
       printf '  ✅ %-12s %s\n' "$tool" "$(command -v "$tool")"
     else
@@ -674,9 +674,25 @@ install_pi_agent() {
   command -v npm >/dev/null 2>&1 || { warn "未检测到 npm，先安装 Node.js。"; install_node; }
   local package="$(mktemp).tgz"
   download_asset "packages/pi-coding-agent-0.73.1.tgz" "https://registry.npmjs.org/@mariozechner/pi-coding-agent/-/pi-coding-agent-0.73.1.tgz" "$package"
-  npm install --global "$package"
+  npm install --global "$package" --registry "https://registry.npmmirror.com" || {
+    warn "npmmirror 安装失败，回退当前 npm registry。"
+    npm install --global "$package"
+  }
   rm -f "$package"
   command -v pi >/dev/null 2>&1 && pi --version || warn "Pi Agent 已安装；请重开终端以加载 PATH。"
+}
+
+install_mimocode() {
+  command -v npm >/dev/null 2>&1 || { warn "未检测到 npm，先安装 Node.js。"; install_node; }
+  local package="$(mktemp).tgz"
+  confirm "安装小米官方 MiMoCode 0.1.13 吗？" || return 0
+  download_asset "packages/mimo-ai-cli-0.1.13.tgz" "https://registry.npmjs.org/@mimo-ai/cli/-/cli-0.1.13.tgz" "$package"
+  npm install --global "$package" --registry "https://registry.npmmirror.com" || {
+    warn "npmmirror 安装失败，回退当前 npm registry。"
+    npm install --global "$package"
+  }
+  rm -f "$package"
+  command -v mimo >/dev/null 2>&1 && mimo --version || warn "MiMoCode 已安装；请重开终端以加载 PATH，然后运行 mimo。"
 }
 
 install_codex_cli() {
@@ -748,7 +764,7 @@ run_item() {
     13) configure_static_ip ;; 14) restore_dhcp ;;
     15) install_homebrew ;; 16) install_ffmpeg ;; 17) install_ego_lite ;; 18) check_environment ;;
     19) install_pi_agent ;; 20) install_codex_cli ;; 21) install_codex_desktop ;;
-    22) install_git ;; 23) install_claude_code ;;
+    22) install_git ;; 23) install_claude_code ;; 24) install_mimocode ;;
     *) die "无效选项：$1" ;;
   esac
 }
@@ -772,6 +788,7 @@ main() {
 19) 安装 Pi Agent      20) 安装 Codex CLI
 21) 安装 Codex 桌面客户端
 22) 安装 Git             23) 安装 Claude Code CLI
+24) 安装 MiMoCode
 0) 退出
 EOF
     read_interactive "请选择：" choice

@@ -1,10 +1,10 @@
 # Mirror Finder
 
-面向 Windows、macOS 与常见 Linux 发行版的交互式环境初始化脚本。它可安装 Git、Node.js、Python、FFmpeg、Docker、Podman、OpenCode、Hermes Agent、FlClash、Pi Agent、Codex CLI、Claude Code CLI 与 Codex 桌面客户端，并可按需配置包管理器、npm、pip、Docker/Podman 镜像与 IPv4 地址。macOS/Linux 使用 Bash 入口；Windows 使用 PowerShell 入口和 Chocolatey，并以 Playwright + Chrome 替代仅支持 macOS 的 Ego Lite。
+面向 Windows、macOS 与常见 Linux 发行版的交互式环境初始化脚本。它可安装 Git、Node.js、Python、FFmpeg、Docker、Podman、OpenCode、Hermes Agent、FlClash、Pi Agent、MiMoCode、Codex CLI、Claude Code CLI 与 Codex 桌面客户端，并可按需配置包管理器、npm、pip、Docker/Podman 镜像与 IPv4 地址。macOS/Linux 使用 Bash 入口；Windows 使用 PowerShell 入口和 Chocolatey，并以 Playwright + Chrome 替代仅支持 macOS 的 Ego Lite。
 
 所有换源功能都会先请求镜像的轻量元数据接口，按实测延迟排序并展示最快的最多 5 个中国大陆镜像。选择镜像后，脚本会再次确认，才会写入配置。
 
-下图展示前 18 项基础菜单；当前脚本另增加第 19–23 项 Pi Agent、Codex CLI、Codex 桌面客户端、Git 和 Claude Code CLI：
+下图展示前 18 项基础菜单；当前脚本另增加第 19–24 项 Pi Agent、Codex CLI、Codex 桌面客户端、Git、Claude Code CLI 和 MiMoCode：
 
 ![Mirror Finder 18 项安装与配置菜单预览](docs/images/installer-menu.png)
 
@@ -39,7 +39,7 @@ bash -c "$(curl -fsSL https://cnb.cool/echohaoran/mirror-finder/-/git/raw/main/s
 
 该命令会下载并执行脚本，同时保留终端输入供菜单使用；如需在执行前审阅内容，请使用上方的克隆方式。
 
-也可只执行一项，例如 `./scripts/install.sh 19` 安装 Pi Agent、`20` 安装 Codex CLI、`21` 安装 Codex 桌面客户端、`22` 安装 Git、`23` 安装 Claude Code CLI。
+也可只执行一项，例如 `./scripts/install.sh 19` 安装 Pi Agent、`20` 安装 Codex CLI、`23` 安装 Claude Code CLI、`24` 安装 MiMoCode。
 
 支持 macOS（Homebrew）以及 Debian/Ubuntu、Fedora/RHEL/Rocky/AlmaLinux、Arch Linux。WSL 也使用该 Bash 入口。
 
@@ -54,7 +54,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\scripts\install.ps1
 ```
 
-也可只运行一项，例如 `.\scripts\install.ps1 18` 执行只读环境检查。Windows 菜单与 Bash 入口保持 1–23 编号对应，其中：
+也可只运行一项，例如 `.\scripts\install.ps1 18` 执行只读环境检查。Windows 菜单与 Bash 入口保持 1–24 编号对应，其中：
 
 - 1、15 使用 Chocolatey，不安装 Homebrew。
 - 6 在选定的 WSL 发行版内配置 Docker stable 仓库，完整安装 Engine、CLI、containerd、Buildx 与 Compose；7 备份并写入 WSL 内的 `/etc/docker/daemon.json`。
@@ -67,6 +67,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 - 21 优先从 CNB 的 `assets/desktop/` 获取 Codex/ChatGPT 桌面客户端，未命中时回退官方来源。
 - 22 安装 Git；macOS/Linux 使用系统包管理器，Windows 使用 Chocolatey。
 - 23 优先从 CNB 获取 Anthropic 原生安装器并安装 Claude Code CLI `stable` 渠道；Windows 缺少 Git 时会先安装 Git。
+- 24 安装小米官方 MiMoCode 0.1.13；入口包优先从 CNB 获取，当前平台二进制优先由 npmmirror 解析。
 
 如果 Windows 尚未安装任何 WSL 发行版，容器菜单会先请求确认，再调用 `wsl --install --distribution Ubuntu`；该步骤可能要求重启并完成 Ubuntu 首次初始化。
 
@@ -116,3 +117,4 @@ macOS 网络服务、NetworkManager、Netplan、systemd-networkd 或传统 ifcfg
 - [Codex CLI](https://learn.chatgpt.com/docs/codex/cli)
 - [Codex 桌面客户端](https://learn.chatgpt.com/docs/app)
 - [Claude Code 安装文档](https://code.claude.com/docs/en/installation)
+- [小米 MiMoCode 安装文档](https://mimo.mi.com/docs/en-US/tokenplan/integration/mimo-code)
