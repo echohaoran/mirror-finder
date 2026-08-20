@@ -31,6 +31,12 @@ Gitee：
 bash -c "$(curl -fsSL https://gitee.com/echohaoran/mirror-finder/raw/main/scripts/install.sh)"
 ```
 
+CNB：
+
+```bash
+bash -c "$(curl -fsSL https://cnb.cool/echohaoran/mirror-finder/-/git/raw/main/scripts/install.sh)"
+```
+
 该命令会下载并执行脚本，同时保留终端输入供菜单使用；如需在执行前审阅内容，请使用上方的克隆方式。
 
 也可只执行一项，例如 `./scripts/install.sh 2` 安装 Node.js、npm 与 npx，或用 `16` 安装 FFmpeg、`17` 下载 Ego Lite、`18` 只读检查媒体工具环境。
