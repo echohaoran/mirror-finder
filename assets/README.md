@@ -18,3 +18,7 @@ Codex/ChatGPT 桌面端单个平台包约 365–647 MB，不适合直接放进�
 npm、pip、Chocolatey、APT/DNF/Pacman、Homebrew bottles 和容器镜像属于持续更新的包
 生态，不复制整个仓库；脚本继续测速并选择中国大陆镜像。Pi Agent 的入口 tarball 已固定
 到本目录，但其 npm 依赖仍由用户配置的 npm 镜像解析。
+
+Claude Code 的 macOS/Linux 与 Windows 原生安装器已镜像到本目录，并固定使用 `stable`
+渠道。平台二进制由安装器从 Anthropic 发布服务解析，并依据官方 manifest 的 SHA-256
+进行校验；原生安装保留后台安全更新能力。

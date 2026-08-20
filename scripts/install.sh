@@ -395,7 +395,7 @@ check_environment() {
     *) processor_name="未知架构" ;;
   esac
   printf '\n系统信息：\n  系统：%s\n  处理器：%s（%s）\n\n组件状态：\n' "$(uname -s)" "$processor_name" "$machine_arch"
-  for tool in git brew node npm ffmpeg ego-browser; do
+  for tool in git brew node npm ffmpeg claude ego-browser; do
     if command -v "$tool" >/dev/null 2>&1; then
       printf '  ✅ %-12s %s\n' "$tool" "$(command -v "$tool")"
     else
@@ -684,6 +684,16 @@ install_codex_cli() {
   command -v codex >/dev/null 2>&1 && codex --version || warn "Codex CLI 已安装；请重开终端以加载 PATH。"
 }
 
+install_claude_code() {
+  local installer
+  confirm "安装 Claude Code CLI stable 渠道吗？" || return 0
+  installer="$(mktemp)"
+  download_asset "installers/claude-code-install.sh" "https://claude.ai/install.sh" "$installer"
+  bash "$installer" stable
+  rm -f "$installer"
+  command -v claude >/dev/null 2>&1 && claude --version || warn "Claude Code 已安装；请重开终端以加载 PATH，然后运行 claude 登录。"
+}
+
 install_codex_desktop() {
   local path upstream target arch
   arch="$(uname -m)"
@@ -738,7 +748,7 @@ run_item() {
     13) configure_static_ip ;; 14) restore_dhcp ;;
     15) install_homebrew ;; 16) install_ffmpeg ;; 17) install_ego_lite ;; 18) check_environment ;;
     19) install_pi_agent ;; 20) install_codex_cli ;; 21) install_codex_desktop ;;
-    22) install_git ;;
+    22) install_git ;; 23) install_claude_code ;;
     *) die "无效选项：$1" ;;
   esac
 }
@@ -761,7 +771,7 @@ main() {
 17) 下载 Ego Lite      18) 检查媒体工具环境
 19) 安装 Pi Agent      20) 安装 Codex CLI
 21) 安装 Codex 桌面客户端
-22) 安装 Git
+22) 安装 Git             23) 安装 Claude Code CLI
 0) 退出
 EOF
     read_interactive "请选择：" choice

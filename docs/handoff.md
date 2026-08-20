@@ -1,5 +1,11 @@
 # Handoff
 
+## 2026-08-20 Claude Code CLI
+
+- Menu item 23 installs Claude Code CLI from mirrored native installers using the stable channel.
+- Windows ensures Git is present first; both environment checks include `claude`.
+- Platform binaries remain dynamically resolved and checksum-verified by Anthropic's installer.
+
 ## 2026-08-20 Git installer
 
 - Menu item 22 installs Git through the native package manager on Bash platforms and Chocolatey on Windows.

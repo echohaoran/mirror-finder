@@ -11,7 +11,7 @@
 
 [CmdletBinding()]
 param(
-    [ValidateRange(1, 22)]
+    [ValidateRange(1, 23)]
     [int]$Item
 )
 
@@ -405,6 +405,19 @@ function Install-CodexDesktop {
     } finally { Remove-Item -LiteralPath $installer -Force -ErrorAction SilentlyContinue }
 }
 
+function Install-ClaudeCode {
+    if (-not (Test-Command 'git')) { Write-Info 'Claude Code Windows 版需要 Git，先安装 Git。'; Install-Git }
+    if (-not (Confirm-Action '确认安装 Claude Code CLI stable 渠道？')) { return }
+    $installer = Join-Path ([IO.Path]::GetTempPath()) ('claude-code-install-{0}.ps1' -f [guid]::NewGuid())
+    try {
+        Get-MirroredAsset 'installers/claude-code-install.ps1' 'https://claude.ai/install.ps1' $installer
+        & $installer stable
+        if ($LASTEXITCODE -ne 0) { Stop-WithError "Claude Code 安装失败，退出码：$LASTEXITCODE" }
+        $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
+        if (Test-Command 'claude') { claude --version } else { Write-WarningMessage 'Claude Code 已安装；请重开 PowerShell 后运行 claude 登录。' }
+    } finally { Remove-Item -LiteralPath $installer -Force -ErrorAction SilentlyContinue }
+}
+
 function Test-ChromeInstalled {
     $paths = @(
         "$env:ProgramFiles\Google\Chrome\Application\chrome.exe",
@@ -418,7 +431,7 @@ function Check-Environment {
     Write-Host "`n系统：$([Environment]::OSVersion.VersionString)"
     Write-Host "PowerShell：$($PSVersionTable.PSVersion)"
     Write-Host "架构：$env:PROCESSOR_ARCHITECTURE`n"
-    foreach ($tool in @('git', 'choco', 'node', 'npm', 'python', 'pip', 'ffmpeg', 'opencode', 'hermes', 'playwright')) {
+    foreach ($tool in @('git', 'choco', 'node', 'npm', 'python', 'pip', 'ffmpeg', 'opencode', 'hermes', 'claude', 'playwright')) {
         $command = Get-Command $tool -ErrorAction SilentlyContinue
         if ($command) { Write-Host ('  OK  {0,-12} {1}' -f $tool, $command.Source) -ForegroundColor Green }
         else { Write-Host ('  --  {0,-12} 未安装或不在 PATH 中' -f $tool) -ForegroundColor DarkYellow }
@@ -459,6 +472,7 @@ function Invoke-MenuItem([int]$Number) {
         20 { Install-CodexCli }
         21 { Install-CodexDesktop }
         22 { Install-Git }
+        23 { Install-ClaudeCode }
         default { Stop-WithError "无效选项：$Number" }
     }
 }
@@ -477,7 +491,7 @@ function Show-Menu {
 18) 检查开发与媒体工具环境
 19) 安装 Pi Agent        20) 安装 Codex CLI
 21) 安装 Codex 桌面客户端
-22) 安装 Git
+22) 安装 Git             23) 安装 Claude Code CLI
 0) 退出
 '@
     Write-Host $menu
