@@ -2,18 +2,18 @@
 
 ## Goal
 
-Provide one Bash entry point that detects macOS or a common Linux distribution and
-offers an interactive menu for installing development tools and configuring
-optional package, language, and Docker mirrors, plus IPv4 addressing.
+Provide Bash and PowerShell entry points for installing development tools and
+configuring optional package, language, and Docker mirrors, plus IPv4 addressing.
 
 ## Supported platforms
 
 - macOS with Homebrew
+- Windows 10/11 with PowerShell 5.1+ and Chocolatey
 - Debian and Ubuntu (`apt`)
 - Fedora/RHEL/Rocky/AlmaLinux (`dnf` or `yum`)
 - Arch Linux (`pacman`)
 
-Native Windows is intentionally out of scope; use WSL instead.
+Windows uses `scripts/install.ps1`; WSL may use the Bash entry point.
 
 ## Safety requirements
 
@@ -48,6 +48,11 @@ Native Windows is intentionally out of scope; use WSL instead.
 16. Install FFmpeg
 17. Download the Ego Lite DMG on Apple Silicon macOS
 18. Check Homebrew, Node.js, npm, FFmpeg, and ego-browser availability
+
+The Windows menu keeps the same numbering. Chocolatey replaces Homebrew; Docker
+Engine, Compose, and Podman run inside a selected WSL distribution; native
+NetTCPIP cmdlets handle IPv4/DHCP; and item 17 installs Playwright plus its
+managed Chrome instead of Ego Lite.
 
 Each menu item can be run independently, repeatedly, and non-interactively by
 passing its number as the first argument.

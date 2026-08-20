@@ -49,3 +49,8 @@ latency order, then require selection and confirmation before configuration.
 - The former `setup-media-tools.sh` workflow is integrated into the main entry
   point as Homebrew bootstrap, FFmpeg installation, Apple Silicon Ego Lite
   download, and a read-only media-tool environment check (items 15-18).
+- Native Windows has a PowerShell 5.1+ entry point at `scripts/install.ps1`. It
+  retains menu items 1-18, uses Chocolatey instead of Homebrew, uses Windows
+  NetTCPIP cmdlets for addressing, installs Docker/Compose and Podman inside a
+  selected WSL distribution, resolves FlClash from official GitHub releases,
+  and replaces Ego Lite with Playwright plus Chrome.

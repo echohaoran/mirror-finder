@@ -38,3 +38,5 @@
 - The startup banner links to the project repository and `echohaoran.top`.
 - Media-tool setup lives in the single `scripts/install.sh` entry point: items
   15-18 cover Homebrew, FFmpeg, Ego Lite, and environment inspection.
+- Windows uses `scripts/install.ps1` with the same 18 menu numbers. Items 15-18
+  are Chocolatey, FFmpeg, Playwright + Chrome, and environment inspection.
