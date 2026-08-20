@@ -234,15 +234,16 @@ function Invoke-Wsl([string]$Distribution, [string]$Command, [switch]$Root) {
 
 function Install-Docker {
     $distribution = Get-WslDistribution
-    Write-WarningMessage "将使用 Docker 官方 convenience script 在 WSL 发行版 $distribution 内安装 Docker Engine 与 Compose。"
-    if (-not (Confirm-Action '继续安装 WSL Docker Engine 吗？')) { return }
+    Write-WarningMessage "将在 WSL $distribution 中移除冲突包，配置 Docker stable 仓库，并安装 Engine、CLI、containerd、Buildx 与 Compose。"
+    if (-not (Confirm-Action '继续安装完整的生产型 WSL Docker Engine 吗？')) { return }
     $dockerInstaller = "$script:CnbAssetBase/installers/docker-install.sh"
-    $bootstrap = "if ! command -v curl >/dev/null; then if command -v apt-get >/dev/null; then apt-get update && apt-get install -y curl ca-certificates; elif command -v dnf >/dev/null; then dnf install -y curl ca-certificates; elif command -v pacman >/dev/null; then pacman -Sy --needed --noconfirm curl ca-certificates; else exit 1; fi; fi; tmp=`$(mktemp); curl -fsSL '$dockerInstaller' -o `"`$tmp`" || curl -fsSL https://get.docker.com -o `"`$tmp`"; sh `"`$tmp`"; rm -f `"`$tmp`""
+    $dockerInstallerHash = '32637cfe8de8c2d2a29a2b6435051829a56dd93f2dfe3c825c0315bb54163119'
+    $bootstrap = "if ! command -v curl >/dev/null; then if command -v apt-get >/dev/null; then apt-get update && apt-get install -y curl ca-certificates; elif command -v dnf >/dev/null; then dnf install -y curl ca-certificates; elif command -v pacman >/dev/null; then pacman -Sy --needed --noconfirm curl ca-certificates; else exit 1; fi; fi; tmp=`$(mktemp); curl -fsSL '$dockerInstaller' -o `"`$tmp`"; echo '$dockerInstallerHash  ' `"`$tmp`" | sha256sum --check --status; sh `"`$tmp`"; rm -f `"`$tmp`""
     Invoke-Wsl $distribution $bootstrap -Root
     $linuxUser = (& wsl.exe --distribution $distribution -- bash -lc 'id -un').Trim()
     if ($LASTEXITCODE -eq 0 -and $linuxUser) { Invoke-Wsl $distribution "usermod -aG docker '$linuxUser'" -Root }
     Invoke-Wsl $distribution 'service docker start >/dev/null 2>&1 || systemctl start docker >/dev/null 2>&1 || true' -Root
-    Invoke-Wsl $distribution 'docker --version && docker compose version'
+    Invoke-Wsl $distribution 'docker --version && docker buildx version && docker compose version'
     Write-Info "Docker Engine 已安装到 WSL：$distribution。重新进入 WSL 后 docker 组权限生效。"
 }
 

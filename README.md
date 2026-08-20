@@ -57,7 +57,7 @@ Set-ExecutionPolicy -Scope Process Bypass
 也可只运行一项，例如 `.\scripts\install.ps1 18` 执行只读环境检查。Windows 菜单与 Bash 入口保持 1–21 编号对应，其中：
 
 - 1、15 使用 Chocolatey，不安装 Homebrew。
-- 6 在选定的 WSL 发行版内使用 Docker 官方安装脚本安装 Docker Engine 与 Compose；7 备份并写入 WSL 内的 `/etc/docker/daemon.json`。
+- 6 在选定的 WSL 发行版内配置 Docker stable 仓库，完整安装 Engine、CLI、containerd、Buildx 与 Compose；7 备份并写入 WSL 内的 `/etc/docker/daemon.json`。
 - 8 在选定的 WSL 发行版内通过其包管理器安装 Podman 与 Compose provider；9 写入 WSL 内的 containers registry 配置。
 - 11 使用 Hermes Agent 官方 Windows PowerShell 安装器。
 - 12 从 FlClash 官方 GitHub Releases 解析 Windows 安装包。
@@ -87,6 +87,8 @@ npm、pip、系统包、Homebrew bottles、Chocolatey 和容器镜像属于持�
 
 - 写入镜像配置前会测速、要求选择并二次确认；系统级配置会备份到 `~/.mirror-finder/backups/`。
 - Docker、OpenCode 与 Hermes Agent 的官方安装脚本会先下载到临时文件再执行。
+- Linux/WSL 的 Docker 不使用仅推荐测试和开发环境的 convenience script；项目安装器按 stable 软件仓库安装完整组件，后续可由系统包管理器统一升级。安装前会明确确认移除冲突的 Docker/containerd 软件包。
+- macOS 的 Docker Desktop 只作为本机开发环境；需要长期运行生产工作负载时应使用 Docker 官方支持的 Linux 主机。
 - Docker 镜像由测速结果选择；macOS Docker Desktop 的配置需在其 Settings 页面粘贴，Windows 则写入 WSL 内的 Docker Engine 配置。
 - 镜像服务可用性与适用地区会变化；如无法更新，请恢复备份并改用官方源。
 

@@ -7,6 +7,7 @@
 - Menu items 19–21 install Pi Agent, Codex CLI, and the Codex/ChatGPT desktop app.
 - Desktop packages are 365–647 MB each; CNB target paths are reserved pending large-object storage.
 - Package ecosystems remain on measured mainland-China mirrors rather than being vendored into Git.
+- Docker no longer uses `get.docker.com`; the mirrored project installer configures Docker's stable package repository and installs Engine, CLI, containerd, Buildx, Compose, and rootless extras where available.
 
 ## Current state
 

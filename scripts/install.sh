@@ -66,6 +66,15 @@ download_and_run_asset() {
   bash "$tmp"
   rm -f "$tmp"
 }
+download_and_run_asset_root() {
+  local path="$1" upstream="$2" expected_sha256="$3" tmp actual
+  tmp="$(mktemp)"
+  download_asset "$path" "$upstream" "$tmp"
+  if command -v sha256sum >/dev/null 2>&1; then actual="$(sha256sum "$tmp" | awk '{print $1}')"; else actual="$(shasum -a 256 "$tmp" | awk '{print $1}')"; fi
+  [[ "$actual" == "$expected_sha256" ]] || { rm -f "$tmp"; die "资源校验失败：${path}"; }
+  sudo_cmd sh "$tmp"
+  rm -f "$tmp"
+}
 
 load_homebrew_path() {
   command -v brew >/dev/null 2>&1 && return 0
@@ -419,23 +428,18 @@ configure_pip() {
 
 install_docker() {
   if [[ "$OS_ID" == "macos" ]]; then
+    warn "macOS 无法原生运行生产服务器版 Docker Engine；Docker Desktop 仅用于本机开发。生产工作负载请部署到受支持的 Linux 主机。"
     brew install --cask docker
     info "Docker Desktop（含 Docker Compose）已安装；首次请从“应用程序”启动并接受许可。"
   else
-    warn "将使用 Docker 官方 convenience script（适用于开发环境，生产环境请使用 Docker 官方仓库步骤）。"
-    confirm "继续安装 Docker Engine 吗？" || return 0
-    download_and_run_asset "installers/docker-install.sh" "https://get.docker.com"
-    if ! docker compose version >/dev/null 2>&1; then
-      info "正在补装 Docker Compose 插件…"
-      case "$PKG" in
-        apt|dnf|yum) install_packages docker-compose-plugin ;;
-        pacman) install_packages docker-compose ;;
-      esac
-    fi
+    warn "将移除冲突的发行版 Docker/containerd 包，配置 stable 软件仓库，并完整安装 Engine、CLI、containerd、Buildx、Compose 与可用的 rootless extras。"
+    confirm "继续安装生产型 Docker Engine 吗？" || return 0
+    download_and_run_asset_root "installers/docker-install.sh" "${CNB_ASSET_BASE}/installers/docker-install.sh" "32637cfe8de8c2d2a29a2b6435051829a56dd93f2dfe3c825c0315bb54163119"
     sudo_cmd usermod -aG docker "$USER" || true
     info "已将 $USER 加入 docker 组；重新登录后生效。"
   fi
-  docker compose version || warn "未检测到 Docker Compose；请重开终端后执行 docker compose version 检查。"
+  docker buildx version || warn "未检测到 Docker Buildx。"
+  docker compose version || warn "未检测到 Docker Compose。"
 }
 
 configure_docker_mirror() {

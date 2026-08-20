@@ -7,6 +7,10 @@
 `manifest.json` 记录来源和 SHA-256。同步资源后必须重新计算哈希并审阅脚本差异，不能
 无条件覆盖后直接发布。
 
+`installers/docker-install.sh` 不是 Docker 的 convenience script。它按 Docker stable
+软件仓库流程安装完整的 Engine、CLI、containerd、Buildx、Compose，并交由系统包管理器
+持续接收升级和安全更新；安装前会移除与官方软件包冲突的发行版包。
+
 Codex/ChatGPT 桌面端单个平台包约 365–647 MB，不适合直接放进同时推送 GitHub、Gitee
 的普通 Git 历史。清单已经保留 CNB 目标路径；在 CNB 配置大文件/对象存储后，可把文件
 上传到对应 `desktop/` 路径，安装脚本会自动优先命中，未命中时回退官方地址。

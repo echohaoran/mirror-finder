@@ -4,7 +4,7 @@
   "policy": "CNB first, verified upstream fallback",
   "mirrored": [
     {"path":"installers/homebrew-install.sh","sha256":"12479a24be3f5307eecac7cde670fad7118640f031229e964f544b1367b52a41","upstream":"https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"},
-    {"path":"installers/docker-install.sh","sha256":"e57f086075dd69dc7057c61d67a029acfbff649f6e394ac96e2123819516cd28","upstream":"https://get.docker.com"},
+    {"path":"installers/docker-install.sh","sha256":"32637cfe8de8c2d2a29a2b6435051829a56dd93f2dfe3c825c0315bb54163119","upstream":"https://docs.docker.com/engine/install/","note":"project-maintained implementation of Docker stable repository installation"},
     {"path":"installers/opencode-install.sh","sha256":"fc3c1b2123f49b6df545a7622e5127d21cd794b15134fc3b66e1ca49f7fb297e","upstream":"https://opencode.ai/install"},
     {"path":"installers/hermes-install.sh","sha256":"0582d9b1562efcb6e0ac62f4451021667830b830a72ce7d91eaea9fee8b6c09b","upstream":"https://hermes-agent.nousresearch.com/install.sh"},
     {"path":"installers/hermes-install.ps1","sha256":"74225bf244253bfa5bc2b1d16fa3bb8618e199a53d1c0344b37ab9930696d3ba","upstream":"https://hermes-agent.nousresearch.com/install.ps1"},
