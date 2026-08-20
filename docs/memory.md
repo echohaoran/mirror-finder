@@ -36,3 +36,5 @@
   HTTPS token authentication with username `cnb`.
 - README's installation-menu preview is stored in `docs/images/installer-menu.png`.
 - The startup banner links to the project repository and `echohaoran.top`.
+- Media-tool setup lives in the single `scripts/install.sh` entry point: items
+  15-18 cover Homebrew, FFmpeg, Ego Lite, and environment inspection.

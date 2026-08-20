@@ -46,3 +46,6 @@ latency order, then require selection and confirmation before configuration.
   `docs/images/installer-menu.png`.
 - Startup banner now includes the repository URL, blog URL, and EchoHaoRan
   authorship notice.
+- The former `setup-media-tools.sh` workflow is integrated into the main entry
+  point as Homebrew bootstrap, FFmpeg installation, Apple Silicon Ego Lite
+  download, and a read-only media-tool environment check (items 15-18).

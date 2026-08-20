@@ -3,6 +3,7 @@
 set -Eeuo pipefail
 
 APP_NAME="mirror-finder"
+EGO_DMG_URL="https://cdn.ego.app/setup/macos/arm64/egolite.dmg"
 BACKUP_DIR="${HOME}/.${APP_NAME}/backups/$(date +%Y%m%d-%H%M%S)"
 OS_ID=""
 OS_LIKE=""
@@ -54,6 +55,39 @@ download_and_run() {
   curl -fL --retry 3 --proto '=https' --tlsv1.2 "$url" -o "$tmp"
   bash "$tmp"
   rm -f "$tmp"
+}
+
+load_homebrew_path() {
+  command -v brew >/dev/null 2>&1 && return 0
+  if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+}
+
+install_homebrew() {
+  [[ "$OS_ID" == "macos" ]] || die "Homebrew 自动安装仅支持 macOS。"
+  load_homebrew_path
+  if command -v brew >/dev/null 2>&1; then
+    info "Homebrew 已安装：$(brew --version | head -n 1)"
+    return 0
+  fi
+  warn "将从 Homebrew 官方 GitHub 地址下载并执行安装器。"
+  confirm "继续安装 Homebrew 吗？" || return 0
+  download_and_run "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+  load_homebrew_path
+  command -v brew >/dev/null 2>&1 || die "安装器已运行，但当前 Shell 仍找不到 brew；请按安装器提示配置 PATH。"
+  info "Homebrew 安装成功。"
+}
+
+require_homebrew() {
+  load_homebrew_path
+  if ! command -v brew >/dev/null 2>&1; then
+    warn "此操作需要 Homebrew。"
+    install_homebrew
+  fi
+  command -v brew >/dev/null 2>&1 || die "未安装 Homebrew，无法继续。"
 }
 
 # Populates mirror candidates for one ecosystem.  The probe is an inexpensive
@@ -177,7 +211,7 @@ choose_fast_mirror() {
 
 detect_system() {
   case "$(uname -s)" in
-    Darwin) OS_ID="macos"; PKG="brew" ;;
+    Darwin) OS_ID="macos"; PKG="brew"; load_homebrew_path ;;
     Linux)
       [[ -r /etc/os-release ]] || die "无法识别 Linux 发行版（缺少 /etc/os-release）。"
       # shellcheck disable=SC1091
@@ -195,6 +229,7 @@ detect_system() {
 }
 
 install_packages() {
+  [[ "$PKG" == "brew" ]] && require_homebrew
   case "$PKG" in
     apt) sudo_cmd apt-get update; sudo_cmd apt-get install -y "$@" ;;
     dnf) sudo_cmd dnf install -y "$@" ;;
@@ -303,7 +338,52 @@ configure_package_mirror() {
   esac
 }
 
-install_node() { install_packages nodejs npm; command -v npm >/dev/null && npm --version; command -v npx >/dev/null || warn "当前 npm 未提供 npx，请升级 npm。"; }
+install_node() {
+  if [[ "$PKG" == "brew" ]]; then install_packages node; else install_packages nodejs npm; fi
+  command -v npm >/dev/null && npm --version
+  command -v npx >/dev/null || warn "当前 npm 未提供 npx，请升级 npm。"
+}
+install_ffmpeg() { install_packages ffmpeg; ffmpeg -version | head -n 1; }
+
+install_ego_lite() {
+  [[ "$OS_ID" == "macos" ]] || die "Ego Lite 自动下载仅支持 macOS。"
+  [[ "$(uname -m)" == "arm64" ]] || die "Ego Lite 下载地址仅适用于 Apple Silicon（arm64）Mac。"
+  local download_dir="${HOME}/Downloads" target partial
+  target="${download_dir}/egolite.dmg"
+  partial="${target}.part"
+  mkdir -p "$download_dir"
+  info "将下载 Ego Lite ARM64 安装镜像到：$target"
+  warn "Ego Lite 可能复用浏览器登录状态，请仅授予必要账号权限。"
+  if [[ -e "$target" ]]; then
+    confirm "目标文件已存在，是否覆盖？" || return 0
+  else
+    confirm "继续下载 Ego Lite 吗？" || return 0
+  fi
+  curl --fail --location --show-error --progress-bar "$EGO_DMG_URL" --output "$partial"
+  mv -f "$partial" "$target"
+  info "Ego Lite 已下载：$target"
+  printf '请打开 DMG 完成应用安装，然后按 Ego Lite 文档安装 ego-browser Skill。\n'
+}
+
+check_environment() {
+  local machine_arch processor_name tool
+  load_homebrew_path
+  machine_arch="$(uname -m)"
+  case "$machine_arch" in
+    arm64) processor_name="Apple Silicon/ARM64" ;;
+    x86_64) processor_name="Intel/AMD64" ;;
+    *) processor_name="未知架构" ;;
+  esac
+  printf '\n系统信息：\n  系统：%s\n  处理器：%s（%s）\n\n组件状态：\n' "$(uname -s)" "$processor_name" "$machine_arch"
+  for tool in brew node npm ffmpeg ego-browser; do
+    if command -v "$tool" >/dev/null 2>&1; then
+      printf '  ✅ %-12s %s\n' "$tool" "$(command -v "$tool")"
+    else
+      printf '  ❌ %-12s 未安装或不在 PATH 中\n' "$tool"
+    fi
+  done
+  printf '\n'
+}
 configure_npm() {
   choose_fast_mirror npm || return 0
   confirm "确认写入 ${SELECTED_MIRROR} 为 npm/npx 源吗？" || return 0
@@ -603,6 +683,7 @@ run_item() {
     6) install_docker ;; 7) configure_docker_mirror ;; 8) install_podman ;; 9) configure_podman_mirror ;;
     10) install_opencode ;; 11) install_hermes ;; 12) install_flclash ;;
     13) configure_static_ip ;; 14) restore_dhcp ;;
+    15) install_homebrew ;; 16) install_ffmpeg ;; 17) install_ego_lite ;; 18) check_environment ;;
     *) die "无效选项：$1" ;;
   esac
 }
@@ -621,6 +702,8 @@ main() {
 9) 更换 Podman 源      10) 安装 OpenCode
 11) 安装 Hermes Agent  12) 安装 FlClash
 13) 配置固定 IP        14) 恢复 DHCP
+15) 安装 Homebrew      16) 安装 FFmpeg
+17) 下载 Ego Lite      18) 检查媒体工具环境
 0) 退出
 EOF
     read_interactive "请选择：" choice

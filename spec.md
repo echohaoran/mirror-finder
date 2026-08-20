@@ -44,6 +44,10 @@ Native Windows is intentionally out of scope; use WSL instead.
 12. Install FlClash
 13. Configure a static IPv4 address (IP, subnet mask, and gateway)
 14. Restore DHCP on the default-route interface
+15. Install Homebrew on macOS
+16. Install FFmpeg
+17. Download the Ego Lite DMG on Apple Silicon macOS
+18. Check Homebrew, Node.js, npm, FFmpeg, and ego-browser availability
 
 Each menu item can be run independently, repeatedly, and non-interactively by
 passing its number as the first argument.

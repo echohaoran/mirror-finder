@@ -1,6 +1,6 @@
 # Mirror Finder
 
-面向 macOS 与常见 Linux 发行版的交互式环境初始化脚本。它可安装 Node.js、Python、Docker（含 Compose）、Podman（含 Compose provider）、OpenCode、Hermes Agent 和 FlClash，并可按需配置包管理器、npm、pip、Docker/Podman 镜像与 IPv4 地址。
+面向 macOS 与常见 Linux 发行版的交互式环境初始化脚本。它可安装 Node.js、Python、FFmpeg、Docker（含 Compose）、Podman（含 Compose provider）、OpenCode、Hermes Agent 和 FlClash，并可按需配置包管理器、npm、pip、Docker/Podman 镜像与 IPv4 地址。macOS 还可引导安装 Homebrew、下载 Apple Silicon 版 Ego Lite，并检查媒体工具环境。
 
 所有换源功能都会先请求镜像的轻量元数据接口，按实测延迟排序并展示最快的最多 5 个中国大陆镜像。选择镜像后，脚本会再次确认，才会写入配置。
 
@@ -37,7 +37,7 @@ bash -c "$(curl -fsSL https://cnb.cool/echohaoran/mirror-finder/-/git/raw/main/s
 
 该命令会下载并执行脚本，同时保留终端输入供菜单使用；如需在执行前审阅内容，请使用上方的克隆方式。
 
-也可只执行一项，例如 `./scripts/install.sh 2` 安装 Node.js、npm 与 npx。
+也可只执行一项，例如 `./scripts/install.sh 2` 安装 Node.js、npm 与 npx，或用 `16` 安装 FFmpeg、`17` 下载 Ego Lite、`18` 只读检查媒体工具环境。
 
 支持 macOS（Homebrew）以及 Debian/Ubuntu、Fedora/RHEL/Rocky/AlmaLinux、Arch Linux。Windows 请在 WSL 中运行。
 
