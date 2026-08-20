@@ -363,6 +363,7 @@ install_node() {
   command -v npx >/dev/null || warn "当前 npm 未提供 npx，请升级 npm。"
 }
 install_ffmpeg() { install_packages ffmpeg; ffmpeg -version | head -n 1; }
+install_git() { install_packages git; git --version; }
 
 install_ego_lite() {
   [[ "$OS_ID" == "macos" ]] || die "Ego Lite 自动下载仅支持 macOS。"
@@ -394,7 +395,7 @@ check_environment() {
     *) processor_name="未知架构" ;;
   esac
   printf '\n系统信息：\n  系统：%s\n  处理器：%s（%s）\n\n组件状态：\n' "$(uname -s)" "$processor_name" "$machine_arch"
-  for tool in brew node npm ffmpeg ego-browser; do
+  for tool in git brew node npm ffmpeg ego-browser; do
     if command -v "$tool" >/dev/null 2>&1; then
       printf '  ✅ %-12s %s\n' "$tool" "$(command -v "$tool")"
     else
@@ -737,6 +738,7 @@ run_item() {
     13) configure_static_ip ;; 14) restore_dhcp ;;
     15) install_homebrew ;; 16) install_ffmpeg ;; 17) install_ego_lite ;; 18) check_environment ;;
     19) install_pi_agent ;; 20) install_codex_cli ;; 21) install_codex_desktop ;;
+    22) install_git ;;
     *) die "无效选项：$1" ;;
   esac
 }
@@ -759,6 +761,7 @@ main() {
 17) 下载 Ego Lite      18) 检查媒体工具环境
 19) 安装 Pi Agent      20) 安装 Codex CLI
 21) 安装 Codex 桌面客户端
+22) 安装 Git
 0) 退出
 EOF
     read_interactive "请选择：" choice

@@ -1,5 +1,10 @@
 # Handoff
 
+## 2026-08-20 Git installer
+
+- Menu item 22 installs Git through the native package manager on Bash platforms and Chocolatey on Windows.
+- Environment checks now include Git.
+
 ## 2026-08-20 CNB-first asset layer
 
 - Added `assets/manifest.json`, seven mirrored bootstrap scripts, and Pi Agent 0.73.1.

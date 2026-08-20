@@ -11,7 +11,7 @@
 
 [CmdletBinding()]
 param(
-    [ValidateRange(1, 21)]
+    [ValidateRange(1, 22)]
     [int]$Item
 )
 
@@ -364,6 +364,7 @@ function Restore-Dhcp {
 }
 
 function Install-FFmpeg { Install-ChocoPackage @('ffmpeg'); ffmpeg -version | Select-Object -First 1 }
+function Install-Git { Install-ChocoPackage @('git'); git --version }
 
 function Install-PlaywrightChrome {
     if (-not (Test-Command 'npm')) { Write-Info '未检测到 Node.js，先安装 Node.js LTS。'; Install-Node }
@@ -417,7 +418,7 @@ function Check-Environment {
     Write-Host "`n系统：$([Environment]::OSVersion.VersionString)"
     Write-Host "PowerShell：$($PSVersionTable.PSVersion)"
     Write-Host "架构：$env:PROCESSOR_ARCHITECTURE`n"
-    foreach ($tool in @('choco', 'node', 'npm', 'python', 'pip', 'ffmpeg', 'opencode', 'hermes', 'playwright')) {
+    foreach ($tool in @('git', 'choco', 'node', 'npm', 'python', 'pip', 'ffmpeg', 'opencode', 'hermes', 'playwright')) {
         $command = Get-Command $tool -ErrorAction SilentlyContinue
         if ($command) { Write-Host ('  OK  {0,-12} {1}' -f $tool, $command.Source) -ForegroundColor Green }
         else { Write-Host ('  --  {0,-12} 未安装或不在 PATH 中' -f $tool) -ForegroundColor DarkYellow }
@@ -457,6 +458,7 @@ function Invoke-MenuItem([int]$Number) {
         19 { Install-PiAgent }
         20 { Install-CodexCli }
         21 { Install-CodexDesktop }
+        22 { Install-Git }
         default { Stop-WithError "无效选项：$Number" }
     }
 }
@@ -475,6 +477,7 @@ function Show-Menu {
 18) 检查开发与媒体工具环境
 19) 安装 Pi Agent        20) 安装 Codex CLI
 21) 安装 Codex 桌面客户端
+22) 安装 Git
 0) 退出
 '@
     Write-Host $menu
