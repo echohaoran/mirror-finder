@@ -3,6 +3,7 @@
 set -Eeuo pipefail
 
 APP_NAME="mirror-finder"
+CNB_ASSET_BASE="${MIRROR_FINDER_ASSET_BASE:-https://cnb.cool/echohaoran/mirror-finder/-/git/raw/main/assets}"
 EGO_DMG_URL="https://cdn.ego.app/setup/macos/arm64/egolite.dmg"
 BACKUP_DIR="${HOME}/.${APP_NAME}/backups/$(date +%Y%m%d-%H%M%S)"
 OS_ID=""
@@ -49,10 +50,19 @@ backup() {
   cp -a "$source" "$target"
   info "已备份 $source"
 }
-download_and_run() {
-  local url="$1" tmp
+download_asset() {
+  local path="$1" upstream="$2" target="$3"
+  if curl -fL --retry 2 --connect-timeout 8 "${CNB_ASSET_BASE}/${path}" -o "$target"; then
+    info "资源来自 CNB：${path}"
+    return 0
+  fi
+  warn "CNB 资源暂不可用，回退官方上游：${upstream}"
+  curl -fL --retry 3 --proto '=https' --tlsv1.2 "$upstream" -o "$target"
+}
+download_and_run_asset() {
+  local path="$1" upstream="$2" tmp
   tmp="$(mktemp)"
-  curl -fL --retry 3 --proto '=https' --tlsv1.2 "$url" -o "$tmp"
+  download_asset "$path" "$upstream" "$tmp"
   bash "$tmp"
   rm -f "$tmp"
 }
@@ -75,7 +85,7 @@ install_homebrew() {
   fi
   warn "将从 Homebrew 官方 GitHub 地址下载并执行安装器。"
   confirm "继续安装 Homebrew 吗？" || return 0
-  download_and_run "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
+  download_and_run_asset "installers/homebrew-install.sh" "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
   load_homebrew_path
   command -v brew >/dev/null 2>&1 || die "安装器已运行，但当前 Shell 仍找不到 brew；请按安装器提示配置 PATH。"
   info "Homebrew 安装成功。"
@@ -414,7 +424,7 @@ install_docker() {
   else
     warn "将使用 Docker 官方 convenience script（适用于开发环境，生产环境请使用 Docker 官方仓库步骤）。"
     confirm "继续安装 Docker Engine 吗？" || return 0
-    download_and_run "https://get.docker.com"
+    download_and_run_asset "installers/docker-install.sh" "https://get.docker.com"
     if ! docker compose version >/dev/null 2>&1; then
       info "正在补装 Docker Compose 插件…"
       case "$PKG" in
@@ -652,8 +662,46 @@ restore_dhcp() {
   info "DHCP 已恢复并已重新应用网络。"
 }
 
-install_opencode() { download_and_run "https://opencode.ai/install"; command -v opencode >/dev/null && opencode --version || warn "安装完成后请重开终端以加载 PATH。"; }
-install_hermes() { download_and_run "https://hermes-agent.nousresearch.com/install.sh"; command -v hermes >/dev/null && hermes --version || warn "安装完成后请重开终端以加载 PATH。"; }
+install_opencode() { download_and_run_asset "installers/opencode-install.sh" "https://opencode.ai/install"; command -v opencode >/dev/null && opencode --version || warn "安装完成后请重开终端以加载 PATH。"; }
+install_hermes() { download_and_run_asset "installers/hermes-install.sh" "https://hermes-agent.nousresearch.com/install.sh"; command -v hermes >/dev/null && hermes --version || warn "安装完成后请重开终端以加载 PATH。"; }
+
+install_pi_agent() {
+  command -v npm >/dev/null 2>&1 || { warn "未检测到 npm，先安装 Node.js。"; install_node; }
+  local package="$(mktemp).tgz"
+  download_asset "packages/pi-coding-agent-0.73.1.tgz" "https://registry.npmjs.org/@mariozechner/pi-coding-agent/-/pi-coding-agent-0.73.1.tgz" "$package"
+  npm install --global "$package"
+  rm -f "$package"
+  command -v pi >/dev/null 2>&1 && pi --version || warn "Pi Agent 已安装；请重开终端以加载 PATH。"
+}
+
+install_codex_cli() {
+  download_and_run_asset "installers/codex-install.sh" "https://chatgpt.com/codex/install.sh"
+  command -v codex >/dev/null 2>&1 && codex --version || warn "Codex CLI 已安装；请重开终端以加载 PATH。"
+}
+
+install_codex_desktop() {
+  local path upstream target arch
+  arch="$(uname -m)"
+  if [[ "$OS_ID" == "macos" ]]; then
+    path="desktop/Codex.dmg"; upstream="https://persistent.oaistatic.com/codex-app-prod/Codex.dmg"; target="${HOME}/Downloads/Codex.dmg"
+  elif [[ "$PKG" == "apt" ]]; then
+    [[ "$arch" =~ ^(arm64|aarch64)$ ]] && path="desktop/chatgpt_arm64.deb" || path="desktop/chatgpt_amd64.deb"
+    upstream="https://persistent.oaistatic.com/codex-app-prod/linux/deb/latest/${path##*/}"; target="${HOME}/Downloads/${path##*/}"
+  elif [[ "$PKG" =~ ^(dnf|yum)$ ]]; then
+    [[ "$arch" =~ ^(arm64|aarch64)$ ]] && path="desktop/chatgpt.aarch64.rpm" || path="desktop/chatgpt.x86_64.rpm"
+    upstream="https://persistent.oaistatic.com/codex-app-prod/linux/rpm/latest/${path##*/}"; target="${HOME}/Downloads/${path##*/}"
+  else
+    die "Codex 桌面端自动安装目前支持 macOS、Debian/Ubuntu 与 RPM 系 Linux。"
+  fi
+  mkdir -p "${HOME}/Downloads"
+  confirm "下载 Codex 桌面客户端到 ${target} 吗？" || return 0
+  download_asset "$path" "$upstream" "${target}.part"; mv -f "${target}.part" "$target"
+  case "$target" in
+    *.deb) sudo_cmd apt-get install -y "$target" ;;
+    *.rpm) sudo_cmd "$PKG" install -y "$target" ;;
+    *) info "已下载 ${target}，请打开 DMG 完成安装。" ;;
+  esac
+}
 
 install_flclash() {
   local arch asset os_pattern url tmp
@@ -684,6 +732,7 @@ run_item() {
     10) install_opencode ;; 11) install_hermes ;; 12) install_flclash ;;
     13) configure_static_ip ;; 14) restore_dhcp ;;
     15) install_homebrew ;; 16) install_ffmpeg ;; 17) install_ego_lite ;; 18) check_environment ;;
+    19) install_pi_agent ;; 20) install_codex_cli ;; 21) install_codex_desktop ;;
     *) die "无效选项：$1" ;;
   esac
 }
@@ -704,6 +753,8 @@ main() {
 13) 配置固定 IP        14) 恢复 DHCP
 15) 安装 Homebrew      16) 安装 FFmpeg
 17) 下载 Ego Lite      18) 检查媒体工具环境
+19) 安装 Pi Agent      20) 安装 Codex CLI
+21) 安装 Codex 桌面客户端
 0) 退出
 EOF
     read_interactive "请选择：" choice

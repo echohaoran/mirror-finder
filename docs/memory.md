@@ -1,5 +1,11 @@
 # Project memory
 
+## Asset distribution
+
+- Canonical asset base: `https://cnb.cool/echohaoran/mirror-finder/-/git/raw/main/assets`.
+- Fixed resources live under `assets/`; runtime uses CNB first and official upstream only as fallback.
+- Do not commit multi-hundred-megabyte Codex desktop packages to ordinary Git while the branch is also pushed to GitHub/Gitee. Use the reserved CNB large-object paths in `assets/manifest.json`.
+
 - Entry point: `scripts/install.sh`.
 - The script uses Bash and has no required third-party runtime.
 - System source configuration is intentionally opt-in, with timestamped backups.

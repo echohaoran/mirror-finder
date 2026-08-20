@@ -11,7 +11,7 @@
 
 [CmdletBinding()]
 param(
-    [ValidateRange(1, 18)]
+    [ValidateRange(1, 21)]
     [int]$Item
 )
 
@@ -22,6 +22,7 @@ $ProgressPreference = 'SilentlyContinue'
 $script:AppName = 'mirror-finder'
 $script:BackupRoot = Join-Path $HOME ('.{0}\backups\{1}' -f $script:AppName, (Get-Date -Format 'yyyyMMdd-HHmmss'))
 $script:SelectedMirror = $null
+$script:CnbAssetBase = if ($env:MIRROR_FINDER_ASSET_BASE) { $env:MIRROR_FINDER_ASSET_BASE.TrimEnd('/') } else { 'https://cnb.cool/echohaoran/mirror-finder/-/git/raw/main/assets' }
 
 function Write-Info([string]$Message) { Write-Host "[INFO] $Message" -ForegroundColor Cyan }
 function Write-WarningMessage([string]$Message) { Write-Host "[WARN] $Message" -ForegroundColor Yellow }
@@ -66,6 +67,18 @@ function Save-TextBackup([string]$Name, [string[]]$Content) {
     $target = Join-Path $script:BackupRoot $Name
     $Content | Set-Content -LiteralPath $target -Encoding UTF8
     Write-Info "已备份到 $target"
+}
+
+function Get-MirroredAsset([string]$Path, [string]$Upstream, [string]$Destination) {
+    $cnbUrl = "$script:CnbAssetBase/$Path"
+    try {
+        Invoke-WebRequest -UseBasicParsing -Uri $cnbUrl -OutFile $Destination
+        Write-Info "资源来自 CNB：$Path"
+    } catch {
+        Remove-Item -LiteralPath $Destination -Force -ErrorAction SilentlyContinue
+        Write-WarningMessage "CNB 资源暂不可用，回退官方上游：$Upstream"
+        Invoke-WebRequest -UseBasicParsing -Uri $Upstream -OutFile $Destination
+    }
 }
 
 function Get-HttpLatency([string]$Url) {
@@ -156,7 +169,7 @@ function Install-Chocolatey {
     if (-not (Confirm-Action '继续安装 Chocolatey？')) { return }
     $installer = Join-Path ([IO.Path]::GetTempPath()) ('chocolatey-install-{0}.ps1' -f [guid]::NewGuid())
     try {
-        Invoke-WebRequest -UseBasicParsing -Uri 'https://community.chocolatey.org/install.ps1' -OutFile $installer
+        Get-MirroredAsset 'installers/chocolatey-install.ps1' 'https://community.chocolatey.org/install.ps1' $installer
         & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer
         $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
         if (-not (Test-Command 'choco')) { Stop-WithError 'Chocolatey 安装器已运行，但当前会话仍找不到 choco。请重开 PowerShell。' }
@@ -223,7 +236,8 @@ function Install-Docker {
     $distribution = Get-WslDistribution
     Write-WarningMessage "将使用 Docker 官方 convenience script 在 WSL 发行版 $distribution 内安装 Docker Engine 与 Compose。"
     if (-not (Confirm-Action '继续安装 WSL Docker Engine 吗？')) { return }
-    $bootstrap = 'if ! command -v curl >/dev/null; then if command -v apt-get >/dev/null; then apt-get update && apt-get install -y curl ca-certificates; elif command -v dnf >/dev/null; then dnf install -y curl ca-certificates; elif command -v pacman >/dev/null; then pacman -Sy --needed --noconfirm curl ca-certificates; else exit 1; fi; fi; tmp=$(mktemp); curl -fsSL https://get.docker.com -o "$tmp"; sh "$tmp"; rm -f "$tmp"'
+    $dockerInstaller = "$script:CnbAssetBase/installers/docker-install.sh"
+    $bootstrap = "if ! command -v curl >/dev/null; then if command -v apt-get >/dev/null; then apt-get update && apt-get install -y curl ca-certificates; elif command -v dnf >/dev/null; then dnf install -y curl ca-certificates; elif command -v pacman >/dev/null; then pacman -Sy --needed --noconfirm curl ca-certificates; else exit 1; fi; fi; tmp=`$(mktemp); curl -fsSL '$dockerInstaller' -o `"`$tmp`" || curl -fsSL https://get.docker.com -o `"`$tmp`"; sh `"`$tmp`"; rm -f `"`$tmp`""
     Invoke-Wsl $distribution $bootstrap -Root
     $linuxUser = (& wsl.exe --distribution $distribution -- bash -lc 'id -un').Trim()
     if ($LASTEXITCODE -eq 0 -and $linuxUser) { Invoke-Wsl $distribution "usermod -aG docker '$linuxUser'" -Root }
@@ -279,7 +293,7 @@ function Install-Hermes {
     if (-not (Confirm-Action '继续安装 Hermes Agent？')) { return }
     $installer = Join-Path ([IO.Path]::GetTempPath()) ('hermes-install-{0}.ps1' -f [guid]::NewGuid())
     try {
-        Invoke-WebRequest -UseBasicParsing -Uri 'https://hermes-agent.nousresearch.com/install.ps1' -OutFile $installer
+        Get-MirroredAsset 'installers/hermes-install.ps1' 'https://hermes-agent.nousresearch.com/install.ps1' $installer
         & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer
         if ($LASTEXITCODE -ne 0) { Stop-WithError "Hermes 安装失败，退出码：$LASTEXITCODE" }
     } finally { Remove-Item -LiteralPath $installer -Force -ErrorAction SilentlyContinue }
@@ -360,6 +374,35 @@ function Install-PlaywrightChrome {
     Write-Info 'Playwright + Chrome 安装完成。'
 }
 
+function Install-PiAgent {
+    if (-not (Test-Command 'npm')) { Write-Info '未检测到 Node.js，先安装 Node.js LTS。'; Install-Node }
+    if (-not (Confirm-Action '确认安装 Pi Agent？')) { return }
+    $package = Join-Path ([IO.Path]::GetTempPath()) ('pi-coding-agent-{0}.tgz' -f [guid]::NewGuid())
+    try {
+        Get-MirroredAsset 'packages/pi-coding-agent-0.73.1.tgz' 'https://registry.npmjs.org/@mariozechner/pi-coding-agent/-/pi-coding-agent-0.73.1.tgz' $package
+        npm install --global $package
+        if ($LASTEXITCODE -ne 0) { Stop-WithError 'Pi Agent 安装失败。' }
+    } finally { Remove-Item -LiteralPath $package -Force -ErrorAction SilentlyContinue }
+}
+
+function Install-CodexCli {
+    if (-not (Test-Command 'npm')) { Write-Info '未检测到 Node.js，先安装 Node.js LTS。'; Install-Node }
+    if (-not (Confirm-Action '确认通过当前 npm 国内镜像安装 Codex CLI？')) { return }
+    npm install --global '@openai/codex'
+    if ($LASTEXITCODE -ne 0) { Stop-WithError 'Codex CLI 安装失败。' }
+    codex --version
+}
+
+function Install-CodexDesktop {
+    if (-not (Confirm-Action '确认下载并运行 Codex/ChatGPT Windows 桌面客户端安装器？')) { return }
+    $installer = Join-Path ([IO.Path]::GetTempPath()) ('ChatGPT-Installer-{0}.exe' -f [guid]::NewGuid())
+    try {
+        Get-MirroredAsset 'desktop/ChatGPT-Installer.exe' 'https://get.microsoft.com/installer/download/9PLM9XGG6VKS?cid=website_cta_psi' $installer
+        $process = Start-Process -FilePath $installer -Wait -PassThru
+        if ($process.ExitCode -notin 0, 1641, 3010) { Stop-WithError "桌面客户端安装器退出码：$($process.ExitCode)" }
+    } finally { Remove-Item -LiteralPath $installer -Force -ErrorAction SilentlyContinue }
+}
+
 function Test-ChromeInstalled {
     $paths = @(
         "$env:ProgramFiles\Google\Chrome\Application\chrome.exe",
@@ -410,6 +453,9 @@ function Invoke-MenuItem([int]$Number) {
         16 { Install-FFmpeg }
         17 { Install-PlaywrightChrome }
         18 { Check-Environment }
+        19 { Install-PiAgent }
+        20 { Install-CodexCli }
+        21 { Install-CodexDesktop }
         default { Stop-WithError "无效选项：$Number" }
     }
 }
@@ -426,6 +472,8 @@ function Show-Menu {
 15) 安装 Chocolatey     16) 安装 FFmpeg
 17) 安装 Playwright+Chrome
 18) 检查开发与媒体工具环境
+19) 安装 Pi Agent        20) 安装 Codex CLI
+21) 安装 Codex 桌面客户端
 0) 退出
 '@
     Write-Host $menu

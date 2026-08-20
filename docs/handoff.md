@@ -1,5 +1,13 @@
 # Handoff
 
+## 2026-08-20 CNB-first asset layer
+
+- Added `assets/manifest.json`, seven mirrored bootstrap scripts, and Pi Agent 0.73.1.
+- Bash and PowerShell prefer CNB assets and fall back to official upstream URLs.
+- Menu items 19–21 install Pi Agent, Codex CLI, and the Codex/ChatGPT desktop app.
+- Desktop packages are 365–647 MB each; CNB target paths are reserved pending large-object storage.
+- Package ecosystems remain on measured mainland-China mirrors rather than being vendored into Git.
+
 ## Current state
 
 The interactive installer is implemented at `scripts/install.sh`. Mirror actions

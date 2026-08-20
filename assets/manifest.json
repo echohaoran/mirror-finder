@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "cnbBaseUrl": "https://cnb.cool/echohaoran/mirror-finder/-/git/raw/main/assets",
+  "policy": "CNB first, verified upstream fallback",
+  "mirrored": [
+    {"path":"installers/homebrew-install.sh","sha256":"12479a24be3f5307eecac7cde670fad7118640f031229e964f544b1367b52a41","upstream":"https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"},
+    {"path":"installers/docker-install.sh","sha256":"e57f086075dd69dc7057c61d67a029acfbff649f6e394ac96e2123819516cd28","upstream":"https://get.docker.com"},
+    {"path":"installers/opencode-install.sh","sha256":"fc3c1b2123f49b6df545a7622e5127d21cd794b15134fc3b66e1ca49f7fb297e","upstream":"https://opencode.ai/install"},
+    {"path":"installers/hermes-install.sh","sha256":"0582d9b1562efcb6e0ac62f4451021667830b830a72ce7d91eaea9fee8b6c09b","upstream":"https://hermes-agent.nousresearch.com/install.sh"},
+    {"path":"installers/hermes-install.ps1","sha256":"74225bf244253bfa5bc2b1d16fa3bb8618e199a53d1c0344b37ab9930696d3ba","upstream":"https://hermes-agent.nousresearch.com/install.ps1"},
+    {"path":"installers/chocolatey-install.ps1","sha256":"44e045ed5350758616d664c5af631e7f2cd10165f5bf2bd82cbf3a0bb8f63462","upstream":"https://community.chocolatey.org/install.ps1"},
+    {"path":"installers/codex-install.sh","sha256":"ba92dd27e5c06f0d3bbc58bfa4b9cfb6599cd2742fbb1f92a2765e6c07dedb5a","upstream":"https://chatgpt.com/codex/install.sh"},
+    {"path":"packages/pi-coding-agent-0.73.1.tgz","sha256":"7bf5d492670c04fd7c599dee7e6eaabff964084affd216766107e6741df7a2e1","upstream":"https://registry.npmjs.org/@mariozechner/pi-coding-agent/-/pi-coding-agent-0.73.1.tgz"}
+  ],
+  "largeOrDynamic": [
+    {"name":"Codex desktop macOS","cnbPath":"desktop/Codex.dmg","upstream":"https://persistent.oaistatic.com/codex-app-prod/Codex.dmg","reason":"646 MB; requires CNB large-object storage"},
+    {"name":"Codex desktop Linux amd64 deb","cnbPath":"desktop/chatgpt_amd64.deb","upstream":"https://persistent.oaistatic.com/codex-app-prod/linux/deb/latest/chatgpt_amd64.deb","reason":"388 MB; requires CNB large-object storage"},
+    {"name":"Codex desktop Linux arm64 deb","cnbPath":"desktop/chatgpt_arm64.deb","upstream":"https://persistent.oaistatic.com/codex-app-prod/linux/deb/latest/chatgpt_arm64.deb","reason":"365 MB; requires CNB large-object storage"},
+    {"name":"Codex desktop Linux x86_64 rpm","cnbPath":"desktop/chatgpt.x86_64.rpm","upstream":"https://persistent.oaistatic.com/codex-app-prod/linux/rpm/latest/chatgpt.x86_64.rpm","reason":"434 MB; requires CNB large-object storage"},
+    {"name":"Codex desktop Linux aarch64 rpm","cnbPath":"desktop/chatgpt.aarch64.rpm","upstream":"https://persistent.oaistatic.com/codex-app-prod/linux/rpm/latest/chatgpt.aarch64.rpm","reason":"410 MB; requires CNB large-object storage"},
+    {"name":"Codex desktop Windows","cnbPath":"desktop/ChatGPT-Installer.exe","upstream":"https://get.microsoft.com/installer/download/9PLM9XGG6VKS?cid=website_cta_psi","reason":"Microsoft Store bootstrapper; package is resolved by Microsoft"},
+    {"name":"FlClash","reason":"release filenames change by version and platform"},
+    {"name":"Ego Lite","reason":"vendor currently publishes a platform-specific DMG"},
+    {"name":"Playwright Chrome","reason":"browser revision is selected by the installed Playwright package"}
+  ]
+}
