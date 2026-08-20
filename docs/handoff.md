@@ -1,5 +1,10 @@
 # Handoff
 
+## 2026-08-20 categorized menus
+
+- Bash and PowerShell menus show one option per line.
+- Items are grouped into system environment, HARNESS tools, package managers, and networking without changing item numbers.
+
 ## 2026-08-20 MiMoCode
 
 - Pi Agent remains menu item 19 at the current 0.73.1 release.

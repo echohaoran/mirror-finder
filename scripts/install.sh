@@ -776,19 +776,38 @@ main() {
   while true; do
     cat <<'EOF'
 
-1) 更换包管理器源       2) 安装 Node.js/npm/npx
-3) 更换 npm/npx 源      4) 安装 Python（含 pip）
-5) 更换 Python(pip) 源  6) 安装 Docker
-7) 更换 Docker 源       8) 安装 Podman（含 Compose）
-9) 更换 Podman 源      10) 安装 OpenCode
-11) 安装 Hermes Agent  12) 安装 FlClash
-13) 配置固定 IP        14) 恢复 DHCP
-15) 安装 Homebrew      16) 安装 FFmpeg
-17) 下载 Ego Lite      18) 检查媒体工具环境
-19) 安装 Pi Agent      20) 安装 Codex CLI
+=== 系统环境 ===
+2) 安装 Node.js/npm/npx
+4) 安装 Python（含 pip）
+6) 安装 Docker
+8) 安装 Podman（含 Compose）
+12) 安装 FlClash
+16) 安装 FFmpeg
+17) 下载 Ego Lite
+18) 检查开发与媒体工具环境
+22) 安装 Git
+
+=== HARNESS 工具 ===
+10) 安装 OpenCode
+11) 安装 Hermes Agent
+19) 安装 Pi Agent
+20) 安装 Codex CLI
 21) 安装 Codex 桌面客户端
-22) 安装 Git             23) 安装 Claude Code CLI
+23) 安装 Claude Code CLI
 24) 安装 MiMoCode
+
+=== 包管理器 ===
+1) 更换包管理器源
+3) 更换 npm/npx 源
+5) 更换 Python(pip) 源
+15) 安装 Homebrew
+
+=== 网络 ===
+7) 更换 Docker 源
+9) 更换 Podman 源
+13) 配置固定 IP
+14) 恢复 DHCP
+
 0) 退出
 EOF
     read_interactive "请选择：" choice
