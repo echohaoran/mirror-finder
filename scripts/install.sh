@@ -696,7 +696,7 @@ main() {
     cat <<'EOF'
 
 1) 更换包管理器源       2) 安装 Node.js/npm/npx
-3) 更换 npm/npx 源      4) 安装 Python（含 Compose）
+3) 更换 npm/npx 源      4) 安装 Python（含 pip）
 5) 更换 Python(pip) 源  6) 安装 Docker
 7) 更换 Docker 源       8) 安装 Podman（含 Compose）
 9) 更换 Podman 源      10) 安装 OpenCode
