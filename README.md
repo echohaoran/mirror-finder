@@ -4,12 +4,14 @@
 
 所有换源功能都会先请求镜像的轻量元数据接口，按实测延迟排序并展示最快的最多 5 个中国大陆镜像。选择镜像后，脚本会再次确认，才会写入配置。
 
-![Mirror Finder 安装菜单预览](docs/images/installer-menu.png)
+下图为当前 18 项安装与配置菜单，包含新增的 Homebrew、FFmpeg、Ego Lite 和媒体工具环境检查入口：
+
+![Mirror Finder 18 项安装与配置菜单预览](docs/images/installer-menu.png)
 
 ## 使用
 
 ```bash
-git clone git@github.com:echohaoran/mirror-finder.git
+git clone ssh://git@gitlab.echohaoran.top:2224/echowang/mirror-finder.git
 cd mirror-finder
 chmod +x scripts/install.sh
 ./scripts/install.sh
@@ -41,6 +43,13 @@ bash -c "$(curl -fsSL https://cnb.cool/echohaoran/mirror-finder/-/git/raw/main/s
 
 支持 macOS（Homebrew）以及 Debian/Ubuntu、Fedora/RHEL/Rocky/AlmaLinux、Arch Linux。Windows 请在 WSL 中运行。
 
+## 媒体工具
+
+- 菜单 15 在 macOS 上安装 Homebrew；其他依赖 Homebrew 的安装项也会在缺失时引导安装。
+- 菜单 16 安装 FFmpeg，支持项目覆盖的 macOS 与 Linux 包管理器。
+- 菜单 17 将 Apple Silicon 版 Ego Lite DMG 下载到 `~/Downloads/egolite.dmg`，不会自动打开或安装应用。
+- 菜单 18 只读显示 Homebrew、Node.js、npm、FFmpeg 与 `ego-browser` 的可用状态，不会修改环境。
+
 ## 安全说明
 
 - 写入镜像配置前会测速、要求选择并二次确认；系统级配置会备份到 `~/.mirror-finder/backups/`。
@@ -52,9 +61,9 @@ Docker 与 Podman 共用同一套 Docker Hub 镜像测速候选池；两者的�
 
 ## 固定 IP 与 DHCP
 
-菜单第 11 项会自动找到默认路由网卡，要求输入 IPv4 地址、子网掩码和网关，并识别
+菜单第 13 项会自动找到默认路由网卡，要求输入 IPv4 地址、子网掩码和网关，并识别
 macOS 网络服务、NetworkManager、Netplan、systemd-networkd 或传统 ifcfg 配置。写入
-前会备份并提示网络可能中断；应用后会重新启用网卡或网络服务。第 12 项会恢复该网卡
+前会备份并提示网络可能中断；应用后会重新启用网卡或网络服务。第 14 项会恢复该网卡
 的 DHCP。请避免在未设置带外访问的远程 SSH 主机上执行这两项操作。
 
 ## 参考
